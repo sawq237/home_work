@@ -1,23 +1,28 @@
 from hitbox import Hitbox
 from tkinter import *
+from random import randint
 # 2 задача размесить танки на канвасе,
 # добавить переменные класса (количество созданных танков, размер танка)
 class Tank:
     count = 0 # общее количество изготовленных танков
-    def __init(self, canvas, x, y,model = 'Т-14 Армата', ammo = 100, speed = 1,
+    def __init__(self, canvas, x, y,model = 'Т-14 Армата', ammo = 100, speed = 1,
                  file_up = '../img/tankT34_up.png',
                  file_down = '../img/tankT34_down.png',
                  file_left = '../img/tankT34_left.png',
-                 file_right = '../img/tankT34_right.png'):
-        self.skin_up = PhotoImage(file = file_up)
+                 file_right = '../img/tankT34_right.png',  bot = True):
+        self.__bot = bot
+        self.__target = None
+        self.__skin_up = PhotoImage(file = file_up)
         self.__skin_down = PhotoImage(file=file_down)
         self.__skin_left = PhotoImage(file=file_left)
         self.__skin_right = PhotoImage(file=file_right)
 
 
-        self.__hitbox = Hitbox(x, y, self.get_size(), self.get_size())
+
+
+        self.__hitbox = Hitbox(x, y, self.get_size(), self.get_size(), padding = 0)
         self.__canvas = canvas
-        Tank.__count += 1
+        Tank.count += 1
         self.__model = model
         self.__hp = 100
         self.__xp = 0
@@ -40,6 +45,34 @@ class Tank:
             self.__y = 0
 
         self.__create()  # вызов функции отрисовки танка внутри конструктора
+        self.right()
+
+
+    def set_target(self, target):
+        self.__target = target
+
+
+    def __AI_goto_target(self):
+        pass
+
+    def __AI(self):
+        if randint(1, 30)  == 1:
+
+
+
+            self.__AI_change_orientation()
+
+
+    def __AI_change_orientation(self):
+        rand = randint(0, 3)
+        if rand == 0:
+            self.left()
+        if rand == 1:
+            self.right()
+        if rand == 2:
+            self.forvard()
+        if rand == 3:
+            self.backward()
 
     # Методы класса
 
@@ -78,6 +111,10 @@ class Tank:
 
     def update(self):
         if self.__fuel > self.__speed:
+            if self.__bot:
+                self.__AI()
+
+
             self.__dx = self.__vx * self.__speed
             self.__dy = self.__vy * self.__speed
             self.__x += self.__dx
