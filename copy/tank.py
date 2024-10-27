@@ -53,14 +53,23 @@ class Tank:
 
 
     def __AI_goto_target(self):
-        pass
+        if randint(1, 2) == 1:
+            if self.__target.get_x() < self.get_x():
+                self.left()
+            else:
+                self.right()
+        else:
+             if self.__target.get_y():
+                 self.forvard()
+             else:
+                 self.backward()
 
     def __AI(self):
         if randint(1, 30)  == 1:
-
-
-
-            self.__AI_change_orientation()
+            if  randint(1, 10) < 9 and self.__target is not None:
+                self.__AI_goto_target()
+            else:
+                self.__AI_change_orientation()
 
 
     def __AI_change_orientation(self):
@@ -134,7 +143,12 @@ class Tank:
         self.__hitbox.moveto(self.__x, self.__y)
 
     def intersects(self, other_tank):
-        return self.__hitbox.intersects(other_tank.__hitbox)
+        value =  self.__hitbox.intersects(other_tank.__hitbox)
+        if value:
+            self.__undo_move()
+            if self.__bot:
+                self.__AI_change_orientation()
+            return value
 
     def get_x(self):
         return self.__x
@@ -167,12 +181,16 @@ class Tank:
     def get_size(self):
         return self.__skin_up.width()
 
-    def undo_move(self):
+    def __undo_move(self):
+        if self.__dx == 0 and self.__dy == 0:
+            return
         self.__x -= self.__dx
         self.__y -= self.__dy
         self.__fuel += self.__speed
         self.__update_hitbox()
         self.__repaint()
+        self.__dx = 0
+        self.__dy = 0
 
 
 
