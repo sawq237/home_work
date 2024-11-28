@@ -1,27 +1,20 @@
 # позиционирование камеры на танке игрока
 
 from hitbox import Hitbox
-from tkinter import *
 from random import randint
 # 3 подключение библиотеки world
 import world
+import texture as skin
 
 class Tank:
     __count = 0
 
     def __init__(self, canvas, x, y,model = 'Т-14 Армата', ammo = 100, speed = 10,
-                 file_up = '../img/tankT34_up.png',
-                 file_down = '../img/tankT34_down.png',
-                 file_left = '../img/tankT34_left.png',
-                 file_right = '../img/tankT34_right.png',
+
 
                  bot = True):
         self.__bot = bot
         self.__target = None
-        self.__skin_up = PhotoImage(file = file_up)
-        self.__skin_down = PhotoImage(file = file_down)
-        self.__skin_left = PhotoImage(file = file_left)
-        self.__skin_right = PhotoImage(file = file_right)
         Tank.__count += 1
         self.__hitbox = Hitbox(x, y, self.get_size(), self.get_size(), padding=0)
         self.__canvas = canvas
@@ -86,22 +79,22 @@ class Tank:
     def forvard(self):
         self.__vx = 0
         self.__vy = -1
-        self.__canvas.itemconfig(self.__id, image = self.__skin_up)
+        self.__canvas.itemconfig(self.__id, image = skin.get('tank_up'))
 
     def backward(self):
         self.__vx = 0
         self.__vy = 1
-        self.__canvas.itemconfig(self.__id, image = self.__skin_down)
+        self.__canvas.itemconfig(self.__id, image = skin.get('tank_down'))
 
     def left(self):
         self.__vx = -1
         self.__vy = 0
-        self.__canvas.itemconfig(self.__id, image = self.__skin_left)
+        self.__canvas.itemconfig(self.__id, image = skin.get('tank_left'))
 
     def right(self):
         self.__vx = 1
         self.__vy = 0
-        self.__canvas.itemconfig(self.__id, image = self.__skin_right)
+        self.__canvas.itemconfig(self.__id, image = skin.get('tank_right'))
 
     def stop(self):
         self.__vx = 0
@@ -136,7 +129,7 @@ class Tank:
 
 
     def __create(self):
-        self.__id = self.__canvas.create_image(self.__x, self.__y, image = self.__skin_up, anchor ='nw')
+        self.__id = self.__canvas.create_image(self.__x, self.__y, image = skin.get('tank_up'), anchor ='nw')
 
     def __repaint(self):
         self.__canvas.moveto(self.__id,
@@ -184,19 +177,19 @@ class Tank:
 
 
     def get_size(self):
-        return self.__skin_up.width()
+        return skin.get('tank_up').width()
 
     def __chek_out_of_world(self):
         if self.__hitbox.left < 0 or \
                 self.__hitbox.top < 0 or \
-                self.__hitbox.right >= world.WIDTH or \
-                self.__hitbox.bottom >= world.HEIGHT:
+                self.__hitbox.right >= world.get_width() or \
+                self.__hitbox.bottom >= world.get_height():
             self.__undo_move()
             if self.__bot:
                 self.__AI_change_orientation()
 
     def __del__(self):
-        print(f'удален танк')
+        print(f'танк удален')
         try:
             self.__canvas.delete(self.__id)
         except Exception:

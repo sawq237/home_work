@@ -117,3 +117,9 @@ class _Cell:
         screen_x = get_screen_x(self.__x)
         screen_y = get_screen_y(self.__y)
         self.__canvas.moveto(self.__id, x=screen_x, y=screen_y)
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+# Позиционирование камеры на танке игрока
+
 from tkinter import*
 # 1 подключение библиотеки world
 import world
