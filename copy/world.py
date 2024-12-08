@@ -12,6 +12,9 @@ WIDTH = SCREEN_WIDTH * 6
 HEIGHT = SCREEN_HEIGHT * 4
 _map = []
 
+AIR = 'a'
+
+
 def set_camera_xy(x, y):
     global _camera_x, _camera_y
 
@@ -25,8 +28,15 @@ def set_camera_xy(x, y):
     if y > get_height() - SCREEN_HEIGHT:
         y = get_height() - SCREEN_HEIGHT
 
+    update_all = False
+    if abs(_camera_x- x) >= BLOCK_SIZE or abs(_camera_y- y) >= BLOCK_SIZE:
+        update_all = True
+
     _camera_x = x
     _camera_y = y
+
+    if update_all:
+        update_map(all=True)
 
 GROUND = 'g'
 WATER = 'w'
@@ -36,11 +46,8 @@ BRICK = 'b'
 _canvas = None
 BLOCK_SIZE = 64
 
-AIR = 'a'
-
-
 def get_block(row, col):
-    if row < 0 or col < 0 or row >= get_rows() or col >= get_cols():
+    if row < 0 or row >= get_rows() or col < 0 or col >= get_cols():
         return AIR
     else:
         return _map[row][col].get_block()
@@ -88,27 +95,48 @@ def get_screen_x(world_X):
 def get_screen_y(world_Y):
     return world_Y - _camera_y
 
-def update_map():
-    for i in range(0, get_rows()):
-        for j in range(0, get_cols()):
+def update_map(all=False):
+    first_row = get_row(_camera_y)
+    last_row = get_row(_camera_y + SCREEN_HEIGHT-1)
+    first_col = get_col(_camera_x)
+    last_col = get_col(_camera_x + SCREEN_WIDTH-1)
+    print((first_row, last_row, first_col, last_col))
+
+    if all:
+        first_col= 0
+        first_row = 0
+        last_col = get_cols() - 1
+        last_row = get_rows() - 1
+
+    for i in range(first_row, last_row+1):
+        for j in range(first_col, last_col+1):
             update_cell(i, j)
+
 def update_cell(row, col):
     if row < 0 or col < 0 or row >= get_rows() or col >= get_cols():
         return
     _map[row][col].update()
+def get_row(y):
+    return int(y)//BLOCK_SIZE
+
+def get_col(x):
+    return int(x)//BLOCK_SIZE
+
 
 
 class _Cell:
     def __init__(self, canvas, block, x, y):
         self.__canvas = canvas
         self.__block = block
+        self.__screen_x = get_screen_x(x)
+        self.__screen_y = get_screen_y(y)
         self.__x = x
         self.__y = y
         self.__create_element(block)
 
     def __create_element(self, block):
         if block != GROUND:
-            self.__id = self.__canvas.create_image(self.__x, self.__y, image=texture.get(block), anchor=NW)
+            self.__id = self.__canvas.create_image(self.__screen_x, self.__screen_y, image=texture.get(block), anchor=NW)
 
     def __del__(self):
         try:
@@ -124,7 +152,16 @@ class _Cell:
             return
         screen_x = get_screen_x(self.__x)
         screen_y = get_screen_y(self.__y)
+
+        if self.__screen_x == screen_x and self.__screen_y == screen_y:
+            return
         self.__canvas.moveto(self.__id, x=screen_x, y=screen_y)
+        self.__screen_x = screen_x
+        self.__screen_y = screen_y
+
+
+
+
 
 
 
